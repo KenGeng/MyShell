@@ -13,8 +13,8 @@ Each shell also has its own built-in commands and internal variables.
 
 ### 2. Command
 
-1. **There are three execution commands in MyShell.**
-- Built-in commands
+**There are three execution commands in MyShell.**
+1. **Built-in commands**
 MyShell does not spawn new processes when executing built-in commands, but is executed directly by the shell program.
 cd, echo, exec, exit, pwd, set, shift, test, time, umask, unset, etc.
 
