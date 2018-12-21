@@ -3,28 +3,30 @@ A minishell written by C. Support commands like ls/cd/bg/echo/exec...
 
 # English Introduction
 ## MyShell Basic Introduction
-### shell concept
+### 1. Shell Concept
+
 The shell provides a way to communicate with your operating system. This communication can be done interactively (either from the keyboard and immediately responsive) or in a shell script (non-interactive). A shell script is a bunch of shell and operating system commands placed in a file that can be reused. Essentially, shell scripts are simple combinations of command line commands into a single file.
 Shell is basically a command interpreter, similar to the command under DOS. It receives user commands (such as ls, etc.) and then calls the corresponding application. The more common shells are the standard Bourne shell (sh) and C shell (csh).
 
 The Shell under Linux is a bridge between users and Linux, and is an interface program between the user and the Linux kernel.
 Each shell also has its own built-in commands and internal variables.
 
-### order
-1. There are three execution commands in MyShell.
+### 2. Command
+
+1. **There are three execution commands in MyShell.**
 - Built-in commands
 MyShell does not spawn new processes when executing built-in commands, but is executed directly by the shell program.
 cd, echo, exec, exit, pwd, set, shift, test, time, umask, unset, etc.
 
-2. External commands
+2. **External commands**
 Execution of external commands in MyShell creates a child process, and the exec function is called by the child process to execute an external command. At this point, the environment of the child process will be replaced by the environment of the corresponding external command.
 
-3. Execute a shell script
+3. **Execute a shell script**
 When executing the script, MyShell will first determine if the command is a MyShell internal command or an external command. If it is an internal command, it is directly called by MyShell, and if it is an external command, a new process is created. Can be intuitively understood as an input redirection.
 
-4. MyShell basic functions
+### 3. MyShell basic functions
 
-4.1 Built-in commands
+**3.1 Built-in commands**
 
 
 |Command | Instruction Format | Description |
@@ -48,19 +50,23 @@ among them:
 In my implementation, echo parses variables and quote symbols. But after $, all characters must be variable names
 Sets without parameters display the latest custom variables by default, which is different from the normal set.
 
-4.2 Pipeline
+**3.2 Pipeline**
+
 MyShell only supports single-layer pipes. There can only be one pipe command at a time, such as echo /home | dir
 
-4.3 Execution script
+**3.3 Execution script**
+
 MyShell can extract commands by reading in the file.
 The script can be read using the following command: MyShell filename
 The MyShell command can process commands in a file by reading in a file. When reading in a file, MyShell will read and interpret the contents of the file line by line, and when it reaches the end of the file, MyShell will exit. Note that each line of the file must be a separate command.
 
-4.4 Background Execution Program
+**3.4 Background Execution Program**
+
 Adding a space and a after the command allows the command to execute in the background.
 MyShell implements the background execution of the program by creating a child process. The main process jumps directly to wait for the next command input, without waiting for the end of the subprocess's operation. The child process will automatically end the process after executing the corresponding command. Note: There are some bugs in this part of the implementation.
 
-4.5 variables
+**3.5 variables**
+
 - System environment variables
 Environment variables in the Linux system are initialized when the operating system is started, regardless of the shell version used by the system. Commonly used environment variables are PATH, HOME, USER, PWD, and so on. In MyShell, environment variables are obtained through the external global variable env.
 - local variables
@@ -74,7 +80,8 @@ In MyShell you can assign values ​​directly to positional parameters. Such a
 There are some special positional parameters in the normal shell. $@ represents all values ​​of the positional parameter, and $# represents the number of positional parameters.
 The shift operation can move the positional parameters. For example, shift n: move the position parameter forward by n bits, that is, the n+1th bit moves to the 1st bit, n+2 bit to the 2nd bit... The first n bits are discarded
 
-4.6 Input and Output Redirection
+**3.6 Input and Output Redirection**
+
 The default standard input (stdin=0) and output (stdout=1) in LINUX correspond to the screen of the terminal. Input and output redirection, is the redirection of the output or input of a file, command, program, script to another file, command, program, script. Essentially the standard input and output are each a file (which is already open at system startup with file descriptors of 0 and 1 respectively).
 
 In the shell, the output redirection is implemented by > or >>, that is, the input and output of the table are output to the target file instead of the screen end.
@@ -82,16 +89,20 @@ In the shell, the output redirection is implemented by > or >>, that is, the inp
 The file on the right may or may not exist. If the file does not exist, create a new one. ">"Overwrite the output of the file. ">>" means that the output will be added at the end of the file.
 Similarly, input redirection can be achieved.
 
-4.7 Pipeline operation
+**3.7 Pipeline operation**
+
 In Linux you can use the pipe character ("|") to import or redirect the standard output of a command to the standard output of the next command. For example, command1 | command2 means to operate the output of commamd1 as input to command2. Such as echo /home | dir
 
 ### Introduction to some programming implementations
-Set, unset, shift
+1. Set, unset, shift
 A global list of variables is maintained in the main function. Set is to add variables at the end of the list; unset deletes the corresponding node of the linked list; shift is achieved by right shifting the dummy head of the linked list and renaming the various position parameters.
+
 2. Script execution
 Called the execvp function, re-executed a MyShell, and redirected input to the script file to read in and execute the script command
+
 3. Input and output redirection
 Directly call dup2 to redirect the output to the file. The difference between > and >> is the parameter setting of the open file.
+
 4. Pipeline commands
 Create a new child process, and pass the output of the first command to the input of the second command through the pipeline to implement the pipeline command.
 
@@ -185,11 +196,11 @@ LINUX 中默认的标准输入(stdin=0)和输出(stdout=1)对应的都是终端�
 ### 一些编程实现的介绍
 1. set、unset、shift
 在main函数中维护了一个全局的变量链表。set即在链表尾添加变量；unset即删除链表相应节点；shift的实现是通过右移链表的dummy head，并重命名各个位置参数实现的。
-2.脚本执行
+2. 脚本执行
 调用了execvp函数，重新执行一个MyShell，并重定向输入到脚本文件来读入、执行脚本命令
-3.输入与输出重定向
+3. 输入与输出重定向
 直接调用dup2将输出重定向到文件,>与>>实现差别在于打开文件的参数设置。
-4.管道命令
+4. 管道命令
 新建子进程，通过管道将第一个命令的输出传入第二个的命令的输入，实现管道命令。
 
 以上就是我的MyShell介绍。在实现的过程中，我上网查阅了不少资料，部分参考的代码在程序源代码注释中添加了原作者的网址，另外关于管道操作的实现也咨询了几位同学和学长，一并感谢。
